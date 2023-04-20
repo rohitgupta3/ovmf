@@ -32,6 +32,9 @@ class WebcamInput(ModuleBase):
             self.camera = cv2.VideoCapture(int(config["device"]), cv2.CAP_DSHOW)
         elif pf_system() == 'Linux':
             self.camera = cv2.VideoCapture(int(config["device"]), cv2.CAP_V4L2)
+        # from ChatGPT
+        elif pf_system() == 'Darwin': # MacOS
+            self.camera = cv2.VideoCapture(int(config["device"]), cv2.CAP_AVFOUNDATION)
         else:
             raise Exception('Operating System not supportet.')
         # Set FPS twice to make sure it is correctly set on different systems
@@ -41,9 +44,19 @@ class WebcamInput(ModuleBase):
         self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, int(config["width"]))
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, int(config["height"]))
+        # import pdb
+        # pdb.set_trace()
+        print(f'autoexposure: {config["autoexposure"]}')
+        print(f'autoexposure type: {type(config["autoexposure"])}')
+        print(f'autoexposure None: {config["autoexposure"] is None}')
+        print(f'exposure: {config["exposure"]}')
+        print(f'exposure type: {type(config["exposure"])}')
+        print(f'exposure None: {config["exposure"] is None}')
         if config["autoexposure"]:
+            print('in here')
             self.camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)  # has no effect on windows
         elif config["exposure"] is not None and config["exposure"] > 0:
+            print('in here instead')
             self.camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1) # manual exposure mode
             # setting camera exposure timing is different on Linux and Windows
             # check: https://www.kurokesu.com/main/2020/05/22/uvc-camera-exposure-timing-in-opencv/
@@ -51,6 +64,9 @@ class WebcamInput(ModuleBase):
                 exp = -ceil(log2(1000/config["exposure"]))
             elif pf_system() == 'Linux':
                 exp = config["exposure"] * 10
+            # from ChatGPT:
+            elif pf_system() == 'Darwin':
+                exp = config["exposure"] / 1000
             self.camera.set(cv2.CAP_PROP_EXPOSURE, exp)
         if config["gain"] is not None:
             self.camera.set(cv2.CAP_PROP_GAIN, config["gain"])
