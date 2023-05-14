@@ -8,7 +8,7 @@ if not dir in sys.path:
 dir = str(pathlib.Path(dir).resolve().parents[1])
 if not dir in sys.path:
     sys.path.append(dir)
-    
+
 from blender_fexmm_receiver import BlenderFexMMReceiver
 from blender_render_output import BlenderRenderOutput
 from lib.module_base import ModuleBase, loadConfig
@@ -25,7 +25,7 @@ class BlenderAvatar(ModuleBase):
     render_output = None
 
     last_data = {}
-    
+
 
     def __init__(self, config, **kwargs):
 
@@ -109,7 +109,7 @@ class TriggerRedrawOperator(bpy.types.Operator):
     bl_label = "Timer to Trigger Redraw"
 
     _timer = None
-    
+
 
     def modal(self, context, event):
         if event.type in {'ESC'}:
@@ -132,7 +132,7 @@ class TriggerRedrawOperator(bpy.types.Operator):
         wm.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-        
+
 
 
 def register():
@@ -157,15 +157,15 @@ if __name__ == "__main__":
     space.region_3d.view_perspective = 'CAMERA'
 
     # Do not show gizmo in the upper right corner
-    space.show_gizmo = False 
+    space.show_gizmo = False
 
     # Set shading
     space.shading.type = 'RENDERED'
     #space.shading.type = 'MATERIAL'
-   
+
     register()
 
     bpy.ops.view3d.redraw_timer()
     bpy.ops.view3d.stream_view('INVOKE_DEFAULT')
-    
+
 

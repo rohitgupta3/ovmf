@@ -20,7 +20,7 @@ class ModuleBase():
     def __init__(self, config):
         '''
         Base class for a processing filter within the virtual mirror pipeline. The filter function can be implemented by overwriting the process function.
-        
+
         Typically, the packages are forwarded though the pipeline as specified by the pipelines config file using socket connections such that every filter is started in its own process. However, by creating the objects and calling the processing function explicitly, the socket mechanism can be bypassed. To this end, socket creation and connection can be skipped.
 
         sockets determines if this module is using communication via sockets.
@@ -55,21 +55,21 @@ class ModuleBase():
             self.receiver = None
             self.sender = None
             self.control_command_receiver = None
-        
+
     def process(self, data, image, receiver_channel = ''):
         '''
         data contains the received dict.
-        receiver_channel contains the name of the channel over which data was received. 
+        receiver_channel contains the name of the channel over which data was received.
         '''
         return data, image
 
     def process_control_commands(self, data, receiver_channel = ''):
         '''
         data contains the received dict.
-        receiver_channel contains the name of the channel over which data was received. 
+        receiver_channel contains the name of the channel over which data was received.
         '''
         pass
-        
+
 
     def add_time_measurement(self, data, start_time, end_time, modulename = None):
         if data is None:
@@ -80,7 +80,7 @@ class ModuleBase():
             data['time_statistics'] = {}
         if modulename not in data['time_statistics'].keys():
             data['time_statistics'][modulename]= {}
-                
+
         # separated time_statistics for processing time and time for the whole process
         data['time_statistics'][modulename]["start_time"] = start_time
         data['time_statistics'][modulename]["end_time"] = end_time
@@ -101,7 +101,7 @@ class ModuleBase():
 
         if not self.use_sockets:
             return
-            
+
         # Process controll commands
         data, _  = self.control_command_receiver.receive(block = False)
         while data is not None:
@@ -169,7 +169,7 @@ def output_redirected(source, target):
     source.write = lambda z: os.write(source.fileno(),z.encode() if hasattr(z,'encode') else z) # windows fix, source: https://www.tutorialguruji.com/python/dup2-and-pipe-shenanigans-with-python-and-windows/amp/
     stdout_fd = source.fileno()
     # copy stdout_fd before it is overwritten
-    with os.fdopen(os.dup(stdout_fd), 'wb') as copied: 
+    with os.fdopen(os.dup(stdout_fd), 'wb') as copied:
         source.flush()  # flush library buffers that dup2 knows nothing about
         os.dup2(target.fileno(), stdout_fd)
         try:
