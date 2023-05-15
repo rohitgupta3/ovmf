@@ -57,14 +57,14 @@ class BlenderRenderOutput(ModuleBase):
             print("Using async sender thread.")
             self.sender_thread = Thread(target = self.run, args=(self,))
             self.running = True
-            self.sender_thread.start()  
+            self.sender_thread.start()
 
     def stop_streaming(self):
         print("Stop streaming...", flush=True)
         if self.start_sender_thread:
             self.running = False
             self.sender_thread.join()
-        
+
     @staticmethod
     def run(self):
         while (self.running):
@@ -78,13 +78,13 @@ class BlenderRenderOutput(ModuleBase):
             self.sender.send(msg = self.data, img = self.image)
             self.new_image.clear()
         self.lock.release()
-    
+
     def take_snapshot(self, data, measure_time = True):
 
         start = get_time_ms()
 
         self.lock.acquire()
-        
+
 
         framebuffer = gpu.state.active_framebuffer_get()
         viewport_info = gpu.state.viewport_get()
