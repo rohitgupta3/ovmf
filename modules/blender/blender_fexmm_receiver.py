@@ -56,6 +56,9 @@ class BlenderFexMMReceiver(ModuleBase):
 
 
     def process_control_commands(self, update, receiver_channel = ''):
+        print('`process_control_commands`, `update`:')
+        print(update)
+        print()
         if 'avatar_name' in update:
             if update['avatar_name'] in self.models:
                 self.current_model_name = update['avatar_name']
@@ -82,6 +85,9 @@ class BlenderFexMMReceiver(ModuleBase):
             self.set_rotation_offset(rotation_offset)
 
     def process(self, data, image = None, channel_name = ''):
+        print('`process`, `data`:')
+        print(data)
+        print()
 
         if channel_name != 'fexmm_parameters':
             return None, None
