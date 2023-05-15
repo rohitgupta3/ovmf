@@ -28,7 +28,7 @@ class BlenderFexMMReceiver(ModuleBase):
 
         self.models = list(avatar_models)
         self.fexmm_gaze_origin = fexmm_gaze_origin
-        
+
         # Store initial values of models
         for collection in self.models:
             name = collection.name
@@ -37,7 +37,7 @@ class BlenderFexMMReceiver(ModuleBase):
             self.initial_poses[name]['location'] = model.location.copy()
             self.initial_poses[name]['rotation'] = model.rotation_euler.copy()
             self.initial_poses[name]['scale'] = model.scale.copy()
-         
+
             self.initial_aus[name] = {}
             if model.data.shape_keys is not None:
                 for key, value in model.data.shape_keys.key_blocks.items():
@@ -69,13 +69,13 @@ class BlenderFexMMReceiver(ModuleBase):
             self.fexmm_gaze_origin.location[1] = gaze_offset_y
         if 'avatar_depth_scale' in update:
             depth_scale = float(update['avatar_depth_scale'])
-            self.set_depth_scale(depth_scale) 
+            self.set_depth_scale(depth_scale)
         if 'avatar_location_offset' in update:
             location_offset = np.array(update['avatar_location_offset'], dtype = np.float)
-            self.set_location_offset(location_offset) 
+            self.set_location_offset(location_offset)
         if 'avatar_rotation_offset' in update:
             rotation_offset = np.array(update['avatar_rotation_offset'], dtype = np.float)
-            self.set_rotation_offset(rotation_offset) 
+            self.set_rotation_offset(rotation_offset)
 
     def process(self, data, image = None, channel_name = ''):
 
@@ -93,7 +93,7 @@ class BlenderFexMMReceiver(ModuleBase):
                 location = np.array(data['pose'][0:3])
                 # Scale to blender units
                 location = location * 0.01
-            
+
                 location = [-location[0], location[2], -location[1]]
                 model.location = np.array(location) + np.array(self.location_offset)
                 model.location[1] *= self.depth_scale
@@ -101,12 +101,12 @@ class BlenderFexMMReceiver(ModuleBase):
                 rotation = np.array(data['pose'][3:6])
                 rotation = np.array([rotation[0], -rotation[2], rotation[1]])
                 model.rotation_euler = rotation + np.array(self.rotation_offset)
-            
+
             if model.data.shape_keys is not None and 'au' in data.keys():
                 for key, value in data['au'].items():
                     if key in model.data.shape_keys.key_blocks.keys():
                         model.data.shape_keys.key_blocks[key].value = value
-            
+
             self.last_data = data
 
         return data, image
@@ -119,7 +119,7 @@ class BlenderFexMMReceiver(ModuleBase):
 
     def set_depth_scale(self, depth_scale = 1):
         self.depth_scale = depth_scale
-    
+
     def set_location_offset(self, location = [0,0,0]):
         self.location_offset = location
 
@@ -150,8 +150,8 @@ class BlenderFexMMReceiver(ModuleBase):
                 return collection.objects[self.current_model_name]
         return None
 
-if __name__ == '__main__': 
-    
+if __name__ == '__main__':
+
     blender_fexmm_receiver = BlenderFexMMReceiver(modulename = 'blender', face_models_dict = {}, fexmm_gaze_origin = [0,0,0])
     while (1):
         blender_fexmm_receiver.run()
