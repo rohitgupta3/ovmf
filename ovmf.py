@@ -17,7 +17,7 @@ class Interface:
 
     def __init__(self, view_only = False, debug = True, pipeline=None):
         '''
-        Set view_only = True if you want to display the avatar only. 
+        Set view_only = True if you want to display the avatar only.
         Only useful if you want to use multiple Interfaces.
 
         Set debug = True to print out some infos.
@@ -39,7 +39,7 @@ class Interface:
 
     def set_parameter(self, update):
         '''
-        Set generic parameters in form of a dictionary. 
+        Set generic parameters in form of a dictionary.
         Look at the modules for supported parameters.
         '''
         if self.debug:
@@ -137,14 +137,14 @@ class Interface:
 
     def receive_image(self):
         return self.receiver.receive(block = False)
-   
+
     def receive_and_set_image(self, imgStim = None, adjust_render_size = True, fill_color = 'black'):
         '''
         Receives a new rendered image if available (non-blocking) and sets it to the Psychopy
-        image stimulus (imgStim). 
-        If adjust_render_size is True, the size of the rendered image 
-        will be adjusted to fit into imgStim. Aspect ratio is kept and fill_color is used to 
-        fill-in the border area. 
+        image stimulus (imgStim).
+        If adjust_render_size is True, the size of the rendered image
+        will be adjusted to fit into imgStim. Aspect ratio is kept and fill_color is used to
+        fill-in the border area.
         Otherwise, the size of imgStim is adjusted to the size of the rendered image.
         '''
         if imgStim is not None:
@@ -157,7 +157,7 @@ class Interface:
                     img = Image.fromarray(image).convert('RGBA')
                     size = (int(imgStim.size[0]),int(imgStim.size[1]))
                     img.thumbnail(size)
-                    image = Image.new('RGBA', size, fill_color)   
+                    image = Image.new('RGBA', size, fill_color)
                     offset = (int((imgStim.size[0] - img.size[0])/2),
                         int((imgStim.size[1] - img.size[1])/2))
                     image.paste(img, offset)
@@ -175,10 +175,10 @@ class Interface:
 
         return None
 
-       
+
     def receive_and_convert_image(self):
         '''
-        Receives a new rendered image if available (non-blocking) and sets it to the numpy array. 
+        Receives a new rendered image if available (non-blocking) and sets it to the numpy array.
         '''
         data, im = self.receive_image()
         if data is None or im is None:
