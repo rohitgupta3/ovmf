@@ -37,6 +37,10 @@ class BlenderFexMMReceiver(ModuleBase):
             self.initial_poses[name]['location'] = model.location.copy()
             self.initial_poses[name]['rotation'] = model.rotation_euler.copy()
             self.initial_poses[name]['scale'] = model.scale.copy()
+            # print(f"RG: name is {name}")
+            # print(f"RG: location is {self.initial_poses[name]['location']}")
+            # print(f"RG: rotation is {self.initial_poses[name]['rotation']}")
+            # print(f"RG: scale is {self.initial_poses[name]['scale']}")
 
             self.initial_aus[name] = {}
             if model.data.shape_keys is not None:
