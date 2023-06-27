@@ -38,14 +38,18 @@ class WebcamInput(ModuleBase):
         else:
             raise Exception('Operating System not supportet.')
         # Set FPS twice to make sure it is correctly set on different systems
+        print('config has fps of', int(config["fps"]))
+        print('fps', self.camera.get(cv2.CAP_PROP_FPS))
         self.camera.set(cv2.CAP_PROP_FPS, int(config["fps"]))	# on some systems fps must be set before fourcc
+        print('fps', self.camera.get(cv2.CAP_PROP_FPS))
         self.camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*config["fourcc"][:4]))
         self.camera.set(cv2.CAP_PROP_FPS, int(config["fps"]))	# on some systems fps must be set before fourcc
+        print('fps', self.camera.get(cv2.CAP_PROP_FPS))
         self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        print('setting width to', int(config["width"]))
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, int(config["width"]))
+        print('width now', self.camera.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, int(config["height"]))
-        # import pdb
-        # pdb.set_trace()
         print(f'autoexposure: {config["autoexposure"]}')
         print(f'autoexposure type: {type(config["autoexposure"])}')
         print(f'autoexposure None: {config["autoexposure"] is None}')
@@ -53,10 +57,8 @@ class WebcamInput(ModuleBase):
         print(f'exposure type: {type(config["exposure"])}')
         print(f'exposure None: {config["exposure"] is None}')
         if config["autoexposure"]:
-            print('in here')
             self.camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 3)  # has no effect on windows
         elif config["exposure"] is not None and config["exposure"] > 0:
-            print('in here instead')
             self.camera.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1) # manual exposure mode
             # setting camera exposure timing is different on Linux and Windows
             # check: https://www.kurokesu.com/main/2020/05/22/uvc-camera-exposure-timing-in-opencv/
@@ -118,13 +120,15 @@ class WebcamInput(ModuleBase):
     def process(self, data, image, receiver_channel):
 
         if not self.running:
+            # print('about to capture image')
             # Make sure to continuously grab frames even if we don't deliver them.
             # # this avoids outdated images in the driver's queue.
             self.capture_image()
 
         if (not self.new_image.isSet()) or ((get_time_ms() - self.last_send) < self.delay):
+            # print('nothing to do')
             return None, None
-            
+
         self.lock.acquire()
         timestamp = self.timestamp
         image = self.image
@@ -140,6 +144,12 @@ class WebcamInput(ModuleBase):
         self.last_send = get_time_ms()
 
         return data, image
+
+    # # RG: understanding this class by slowing it down
+    # def run(self, sleep_time=0.0005):
+    #     super().run(sleep_time=5)
+
+
 
     @staticmethod
     def run_capture(self):

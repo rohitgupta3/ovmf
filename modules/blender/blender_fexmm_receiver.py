@@ -83,31 +83,45 @@ class BlenderFexMMReceiver(ModuleBase):
 
     def process(self, data, image = None, channel_name = ''):
         if channel_name != 'fexmm_parameters':
+            print('weird')
             return None, None
 
         model = self.get_current_model()
         if data and model:
             # get and set for current model only
 
+            print('entire data:', data)
+
+            print('model.scale going to be set to:', self.scale)
             model.scale = self.scale
 
 
             if 'pose' in data.keys():
                 location = np.array(data['pose'][0:3])
+                print('raw location:', location)
                 # Scale to blender units
                 location = location * 0.01
 
                 location = [-location[0], location[2], -location[1]]
+                print('location:', location)
+                print('self.location_offset:', self.location_offset)
                 model.location = np.array(location) + np.array(self.location_offset)
+                print('model.location has been set as:', model.location)
+                print('self.depth_scale:', self.depth_scale)
+                print('old model.location[1]', model.location[1])
                 model.location[1] *= self.depth_scale
+                print('new model.location[1]', model.location[1])
 
                 rotation = np.array(data['pose'][3:6])
+                print('raw rotation:', rotation)
                 rotation = np.array([rotation[0], -rotation[2], rotation[1]])
+                print('rotation:', rotation)
                 model.rotation_euler = rotation + np.array(self.rotation_offset)
 
             if model.data.shape_keys is not None and 'au' in data.keys():
                 for key, value in data['au'].items():
                     if key in model.data.shape_keys.key_blocks.keys():
+                        print('going to update au key:', key, 'with value:', value)
                         model.data.shape_keys.key_blocks[key].value = value
 
             self.last_data = data

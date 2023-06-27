@@ -22,9 +22,11 @@ class OpenFaceTracker(ModuleBase):
             if not openface_model_au_root_dir.is_absolute():
                 openface_model_au_root_dir = pl.Path(__file__).resolve().parents[2] / openface_model_au_root_dir
 
+        print(f'openface_binary_dir {openface_binary_dir}')
         sys.path.append(str(openface_binary_dir))
         from openface import OpenFace
         parameters = str(openface_model_au_root_dir)
+        print(f'openface_model_au_root_dir {openface_model_au_root_dir}')
         if 'tracker_parameters' in config:
             parameters += " " + config['tracker_parameters']
         print("Starting OpenFace with parameters {}".format(parameters))
@@ -49,5 +51,8 @@ class OpenFaceTracker(ModuleBase):
 
         return data, image
 
+    # # RG: understanding this class by slowing it down
+    # def run(self, sleep_time=0.0005):
+    #     super().run(sleep_time=5)
 
 Module = ProcessBase(OpenFaceTracker)

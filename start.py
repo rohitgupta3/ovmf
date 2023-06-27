@@ -100,9 +100,13 @@ class ZIB_Pipeline:
 
 			# start this module
 			print('# started', module)
+			print('... with config:', config, '\n')
 			module_path = config['file'][:-3].replace('/', '.')
 			module_code = importlib.import_module(module_path)
+			# below is the `Module` identifier in e.g. webcam_input.py, which is of type
+			# `ProcessBase`, a class defined in module_base.py
 			proc = module_code.Module
+			# below therefore runs the `start` method of the `ProcessBase` class
 			proc.start(config)
 			config['process'] = proc
 			self.modules_started[module] = config

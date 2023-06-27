@@ -33,13 +33,16 @@ class BlenderAvatar(ModuleBase):
 
         rv_config = config
         rv_config['use_sockets'] = False
+        print('rv_config about to be passed to BlenderFexMMReceiver:', rv_config)
         self.receivers.append(BlenderFexMMReceiver(rv_config, self.avatars, self.gaze_origin))
         ro_config = loadConfig(config['pipeline'], 'blender_render_output')
         ro_config = {**config, **ro_config}
+        print('ro_config about to be passed to BlenderRenderOutput:', ro_config)
         self.render_output = BlenderRenderOutput(ro_config, start_sender_thread=True)
         self.render_output.start_streaming()
 
         self.receivers.append(self.render_output)
+        print(self.receivers)
         sys.stdout.flush()
 
     def __del__(self):
@@ -50,6 +53,7 @@ class BlenderAvatar(ModuleBase):
             r.process_control_commands(commands, receiver_channel)
 
     def process(self, data, image, receiver_channel = ''):
+        print('process in blender_avatar')
         for r in self.receivers:
             data, image = r.process_and_measure(data,image, receiver_channel)
 
@@ -81,21 +85,31 @@ class StreamingOperator(bpy.types.Operator):
         argv = None
         if '--' in sys.argv:
             argv = sys.argv[sys.argv.index('--') + 1:]
+        print('argv:', argv)
         parser = argparse.ArgumentParser()
         parser.add_argument('-p', '--pipeline', required=True)
         parser.add_argument('-c', '--config', required=True)
         args, _ = parser.parse_known_args(argv)
+        print('parsed args:', args)
         config = json.loads(args.config)
+        print('config about to be passed to BlenderAvatar:', config)
 
+        print('about to instantiate BlenderAvatar')
         self.blender_receiver = BlenderAvatar(config)
+        print('done instantiating BlenderAvatar')
 
         self._handle_3d = bpy.types.SpaceView3D.draw_handler_add(StreamingOperator.draw, (self, context), 'WINDOW', 'PRE_VIEW')
 
+        # tells Blender that we (this class) should receive events, I think
+        # https://youtu.be/A8S-s7tuTdY?t=189
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
 
 
     def modal(self, context, event):
+        # what is the point of below? the idea that the user could interact w/the system
+        # via keypresses within Blender seems really odd to me for some reason, so half
+        # of me doesn't believe that's what the below is handling... (?)
         if event.type in {'ESC'}:
             bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
             print("Stopping streaming operator")

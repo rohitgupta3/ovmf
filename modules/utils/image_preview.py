@@ -49,5 +49,8 @@ class ImagePreview(ModuleBase):
 
         return data, image
 
+    # # RG: understanding this class by slowing it down
+    # def run(self, sleep_time=0.0005):
+    #     super().run(sleep_time=5)
 
 Module = ProcessBase(ImagePreview)

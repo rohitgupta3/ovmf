@@ -36,6 +36,7 @@ class ModuleBase():
             try:
                 self.receiver = dict()
                 for type, address in config['receive'].items():
+                    print(f'about to create receiver: type {type} and address {address}, queue_size {config["queue_size"]}')
                     self.receiver[type] = Receiver(address=address, type=type, queue_size = config['queue_size'])[type]
             except RuntimeError as e:
                 print(e)
@@ -112,6 +113,7 @@ class ModuleBase():
         # Process normal packages
         if self.receiver is not None and len(self.receiver):
             # We have receivers
+            # for `OpenFaceTracker`, its only receiver is listening to the 'webcam_input' module
             for channel_name, receiver in self.receiver.items():
                 data, image = receiver.receive(block = False)
                 #data, image = receiver.poll(timeout = 0.03, sleep_per_retry = 0.001)
@@ -122,6 +124,9 @@ class ModuleBase():
         elif self.sender:
             # We don't have receiver but sender
             data, image = self.process_and_measure(None, None, '')
+            # print('this is the `data` from `process`\n', data)
+            # print('this is the `image` from `process`\n', image)
+            # print('done\n\n')
             if data:
                 self.sender.send(data, image if self.config['send_image'] else None)
 
@@ -195,10 +200,12 @@ class ProcessBase(Process):
         super().start()
 
     def main(self):
+        print('in main')
         m = self.Cls(self.config, *self.args, **self.kwargs)
         m.run()
 
     def run(self):
+        print('in run')
         Path('logs').mkdir(parents=True, exist_ok=True)
         with output_redirected(sys.stdout, open(f'logs/{self.name}.txt', 'w', encoding='utf-8')), output_redirected(sys.stderr, sys.stdout):
             try:

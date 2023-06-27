@@ -25,6 +25,10 @@ def Receiver(address=None, type='data_type', queue_size=1):
 	socks = dict()
 	if publishers:
 		for k, v in publishers.items():
+			# for webcam_input, `v[1]` is 'tcp://127.0.0.1:42425' and `queue_size` is 0
+			# for webcam_input, `k` is 'control_cmds'. `v[0]` always appears to be 'module'
+			# for openface_tracker, `v[1]` is 'tcp://127.0.0.1:5555' and `queue_size` is I think 1
+			# for openface_tracker, `k` is 'image_data'. `v[0]` always appears ot be 'module'
 			socks[k] = _Receiver(context, v[1], queue_size)
 			print(f"receive {k} from {v[0]} ({v[1]})")
 	return socks
