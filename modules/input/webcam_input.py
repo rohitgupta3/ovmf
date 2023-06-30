@@ -32,6 +32,9 @@ class WebcamInput(ModuleBase):
             self.camera = cv2.VideoCapture(int(config["device"]), cv2.CAP_DSHOW)
         elif pf_system() == 'Linux':
             self.camera = cv2.VideoCapture(int(config["device"]), cv2.CAP_V4L2)
+        # from ChatGPT
+        elif pf_system() == 'Darwin': # MacOS
+            self.camera = cv2.VideoCapture(int(config["device"]), cv2.CAP_AVFOUNDATION)
         else:
             raise Exception('Operating System not supportet.')
         # Set FPS twice to make sure it is correctly set on different systems
@@ -51,6 +54,9 @@ class WebcamInput(ModuleBase):
                 exp = -ceil(log2(1000/config["exposure"]))
             elif pf_system() == 'Linux':
                 exp = config["exposure"] * 10
+            # from ChatGPT:
+            elif pf_system() == 'Darwin':
+                exp = config["exposure"] / 1000
             self.camera.set(cv2.CAP_PROP_EXPOSURE, exp)
         if config["gain"] is not None:
             self.camera.set(cv2.CAP_PROP_GAIN, config["gain"])
